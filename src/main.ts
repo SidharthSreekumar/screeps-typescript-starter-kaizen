@@ -1,7 +1,10 @@
 import { ErrorMapper } from "utils/ErrorMapper";
+import { NameGenerator } from "utils/NameGenerator";
 import roleHarvester from "./modules/role.harvester";
 import roleBuilder from "./modules/role.builder";
 import roleUpgrader from "./modules/role.upgrader";
+
+import MemoryRole from "types/memory.creep";
 
 import _ from "lodash";
 
@@ -26,12 +29,6 @@ declare global {
     upgrading?: boolean;
     room?: string;
     working?: boolean;
-  }
-
-  enum MemoryRole {
-    HARVESTER = "harvester",
-    UPGRADER = "upgrader",
-    BUILDER = "builder"
   }
 
   // Syntax for adding proprties to `global` (ex "global.log")
@@ -74,16 +71,16 @@ export const loop = ErrorMapper.wrapLoop(() => {
   const upgraders = _.filter(Game.creeps, (creep: Creep) => creep.memory.role == MemoryRole.UPGRADER);
   // console.log('Upgraders: ' + upgraders.length);
 
-  if (harvesters.length < 2) {
-    const newName = "Harvester" + Game.time;
+  if (harvesters.length < 2 && Game.spawns["Spawn1"].store[RESOURCE_ENERGY] >= 200) {
+    const newName = "Harvester" + NameGenerator.getName();
     console.log("Spawning new harvester: " + newName);
     Game.spawns["Spawn1"].spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: MemoryRole.HARVESTER } });
-  } else if (builders.length < 1) {
-    const newName = "Builder" + Game.time;
+  } else if (builders.length < 1 && Game.spawns["Spawn1"].store[RESOURCE_ENERGY] >= 200) {
+    const newName = "Builder" + NameGenerator.getName();
     console.log("Spawning new builder: " + newName);
     Game.spawns["Spawn1"].spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: MemoryRole.BUILDER } });
-  } else if (upgraders.length < 5) {
-    const newName = "Upgrader" + Game.time;
+  } else if (upgraders.length < 5 && Game.spawns["Spawn1"].store[RESOURCE_ENERGY] >= 200) {
+    const newName = "Upgrader" + NameGenerator.getName();
     console.log("Spawning new upgrader: " + newName);
     Game.spawns["Spawn1"].spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: MemoryRole.UPGRADER } });
   }
